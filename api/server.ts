@@ -12,7 +12,7 @@ import app from './app.js'
 /**
  * start server with port
  */
-const PORT = process.env.PORT || 8080
+const PORT = parseInt(process.env.PORT || '8080', 10)
 const HOST = '0.0.0.0'
 
 console.error(`[SERVER] ⭐ About to listen on ${HOST}:${PORT}`)
