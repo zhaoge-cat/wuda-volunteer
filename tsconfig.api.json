@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": false,
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": false,
+    "noUncheckedSideEffectImports": false,
+    "forceConsistentCasingInFileNames": false,
+    "baseUrl": "./",
+    "outDir": "./dist",
+    "types": ["node", "express"]
+  },
+  "include": ["api"]
+}
