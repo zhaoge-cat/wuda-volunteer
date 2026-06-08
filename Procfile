@@ -1,1 +1,1 @@
-web: node --import tsx api/server.ts
+web: npm start
