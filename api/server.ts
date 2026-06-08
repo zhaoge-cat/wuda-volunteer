@@ -1,6 +1,11 @@
 /**
  * local server entry file, for local development and production
  */
+
+// 立即打印日志，确保能看到
+console.error('[SERVER] Process starting...')
+process.stderr.write('[SERVER] stderr: Server initialization beginning\n')
+
 import app from './app.js'
 
 /**
@@ -9,27 +14,28 @@ import app from './app.js'
 const PORT = process.env.PORT || 8080
 const HOST = '0.0.0.0'
 
-console.log('Starting Express server initialization...')
+console.error(`[SERVER] About to listen on ${HOST}:${PORT}`)
 
 const server = app.listen(PORT, HOST, () => {
-  console.log(`✓ Server is listening on http://${HOST}:${PORT}`)
+  console.error(`[SERVER] ✓ Server is listening on http://${HOST}:${PORT}`)
+  console.log(`[SERVER] ✓ Server is listening on http://${HOST}:${PORT}`)
 })
 
 /**
  * close server
  */
 process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received')
+  console.error('[SERVER] SIGTERM signal received')
   server.close(() => {
-    console.log('Server closed')
+    console.error('[SERVER] Server closed')
     process.exit(0)
   })
 })
 
 process.on('SIGINT', () => {
-  console.log('SIGINT signal received')
+  console.error('[SERVER] SIGINT signal received')
   server.close(() => {
-    console.log('Server closed')
+    console.error('[SERVER] Server closed')
     process.exit(0)
   })
 })
