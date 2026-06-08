@@ -12,16 +12,6 @@ import path from 'path'
 import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
 
-import authRoutes from './routes/auth.js'
-import userRoutes from './routes/users.js'
-import badgeRoutes from './routes/badges.js'
-import blindboxRoutes from './routes/blindbox.js'
-import activityRoutes from './routes/activities.js'
-import honorRoutes from './routes/honors.js'
-import evaluationRoutes from './routes/evaluations.js'
-import benefitRoutes from './routes/benefits.js'
-import adminRoutes from './routes/admin.js'
-
 // for esm mode
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -36,30 +26,63 @@ app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
 /**
- * API Routes
+ * 健康检查 - 放在所有路由之前，无依赖
  */
-app.use('/api/auth', authRoutes)
-app.use('/api/users', userRoutes)
-app.use('/api/badges', badgeRoutes)
-app.use('/api/blindbox', blindboxRoutes)
-app.use('/api/activities', activityRoutes)
-app.use('/api/honors', honorRoutes)
-app.use('/api/evaluations', evaluationRoutes)
-app.use('/api/benefits', benefitRoutes)
-app.use('/api/admin', adminRoutes)
+app.get('/api/health', (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: 'ok',
+    timestamp: new Date().toISOString(),
+  })
+})
 
 /**
- * health
+ * 延迟加载路由 - 如果导入失败，至少健康检查还能工作
  */
-app.use(
-  '/api/health',
-  (req: Request, res: Response, next: NextFunction): void => {
-    res.status(200).json({
-      success: true,
-      message: 'ok',
-    })
-  },
-)
+try {
+  console.log('Loading routes...')
+  
+  const { default: authRoutes } = await import('./routes/auth.js')
+  app.use('/api/auth', authRoutes)
+  console.log('✓ auth routes loaded')
+  
+  const { default: userRoutes } = await import('./routes/users.js')
+  app.use('/api/users', userRoutes)
+  console.log('✓ users routes loaded')
+  
+  const { default: badgeRoutes } = await import('./routes/badges.js')
+  app.use('/api/badges', badgeRoutes)
+  console.log('✓ badges routes loaded')
+  
+  const { default: blindboxRoutes } = await import('./routes/blindbox.js')
+  app.use('/api/blindbox', blindboxRoutes)
+  console.log('✓ blindbox routes loaded')
+  
+  const { default: activityRoutes } = await import('./routes/activities.js')
+  app.use('/api/activities', activityRoutes)
+  console.log('✓ activities routes loaded')
+  
+  const { default: honorRoutes } = await import('./routes/honors.js')
+  app.use('/api/honors', honorRoutes)
+  console.log('✓ honors routes loaded')
+  
+  const { default: evaluationRoutes } = await import('./routes/evaluations.js')
+  app.use('/api/evaluations', evaluationRoutes)
+  console.log('✓ evaluations routes loaded')
+  
+  const { default: benefitRoutes } = await import('./routes/benefits.js')
+  app.use('/api/benefits', benefitRoutes)
+  console.log('✓ benefits routes loaded')
+  
+  const { default: adminRoutes } = await import('./routes/admin.js')
+  app.use('/api/admin', adminRoutes)
+  console.log('✓ admin routes loaded')
+  
+  console.log('All routes loaded successfully!')
+} catch (error) {
+  console.error('Error loading routes:', error)
+  console.error('Stack:', (error as Error).stack)
+}
 
 /**
  * error handler middleware
