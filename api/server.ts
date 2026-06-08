@@ -1,10 +1,11 @@
 /**
  * local server entry file, for local development and production
+ * VERSION: 2
  */
 
 // 立即打印日志，确保能看到
-console.error('[SERVER] Process starting...')
-process.stderr.write('[SERVER] stderr: Server initialization beginning\n')
+console.error('[SERVER] ⭐ Process starting...')
+process.stderr.write('[SERVER] ⭐ stderr: Server initialization beginning\n')
 
 import app from './app.js'
 
@@ -14,11 +15,11 @@ import app from './app.js'
 const PORT = process.env.PORT || 8080
 const HOST = '0.0.0.0'
 
-console.error(`[SERVER] About to listen on ${HOST}:${PORT}`)
+console.error(`[SERVER] ⭐ About to listen on ${HOST}:${PORT}`)
 
 const server = app.listen(PORT, HOST, () => {
-  console.error(`[SERVER] ✓ Server is listening on http://${HOST}:${PORT}`)
-  console.log(`[SERVER] ✓ Server is listening on http://${HOST}:${PORT}`)
+  console.error(`[SERVER] ✓✓✓ Server is listening on http://${HOST}:${PORT}`)
+  console.log(`[SERVER] ✓✓✓ Server is listening on http://${HOST}:${PORT}`)
 })
 
 /**
