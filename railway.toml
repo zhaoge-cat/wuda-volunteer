@@ -1,7 +1,3 @@
-[build]
-builder = "NIXPACKS"
-buildCommand = "echo 'Skip frontend build for backend'"
-
 [deploy]
 startCommand = "node --import tsx api/server.ts"
 healthcheckPath = "/api/health"
