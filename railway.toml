@@ -1,8 +1,8 @@
 [build]
-buildCommand = "npm install"
+buildCommand = "npm run build"
 
 [deploy]
-startCommand = "node --import tsx api/server.ts"
+startCommand = "npm start"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 60
 restartPolicyType = "ON_FAILURE"
