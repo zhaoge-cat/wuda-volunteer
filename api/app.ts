@@ -25,81 +25,106 @@ app.use(cors())
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
-// 在模块加载时立即初始化数据库
-console.log('Loading database and routes on startup...')
-let dbInitialized = false
-let initError: Error | null = null
+// 初始化标志
+let initComplete = false
+let initError: string | null = null
 
-try {
-  console.log('Importing database module...')
-  const dbModule = await import('./db.js')
-  console.log('✓ Database module imported successfully')
-  
-  console.log('Loading API routes...')
-  
-  const { default: authRoutes } = await import('./routes/auth.js')
-  app.use('/api/auth', authRoutes)
-  console.log('✓ auth routes loaded')
-  
-  const { default: userRoutes } = await import('./routes/users.js')
-  app.use('/api/users', userRoutes)
-  console.log('✓ users routes loaded')
-  
-  const { default: badgeRoutes } = await import('./routes/badges.js')
-  app.use('/api/badges', badgeRoutes)
-  console.log('✓ badges routes loaded')
-  
-  const { default: blindboxRoutes } = await import('./routes/blindbox.js')
-  app.use('/api/blindbox', blindboxRoutes)
-  console.log('✓ blindbox routes loaded')
-  
-  const { default: activityRoutes } = await import('./routes/activities.js')
-  app.use('/api/activities', activityRoutes)
-  console.log('✓ activities routes loaded')
-  
-  const { default: honorRoutes } = await import('./routes/honors.js')
-  app.use('/api/honors', honorRoutes)
-  console.log('✓ honors routes loaded')
-  
-  const { default: evaluationRoutes } = await import('./routes/evaluations.js')
-  app.use('/api/evaluations', evaluationRoutes)
-  console.log('✓ evaluations routes loaded')
-  
-  const { default: benefitRoutes } = await import('./routes/benefits.js')
-  app.use('/api/benefits', benefitRoutes)
-  console.log('✓ benefits routes loaded')
-  
-  const { default: adminRoutes } = await import('./routes/admin.js')
-  app.use('/api/admin', adminRoutes)
-  console.log('✓ admin routes loaded')
-  
-  console.log('✓ All routes loaded successfully!')
-  dbInitialized = true
-} catch (error) {
-  initError = error as Error
-  console.error('❌ CRITICAL ERROR during initialization:')
-  console.error('Error message:', initError.message)
-  console.error('Error name:', initError.name)
-  console.error('Error stack:', initError.stack)
+/**
+ * 同步导入所有路由 - 在模块加载时执行
+ */
+function initializeRoutes() {
+  try {
+    console.log('[App] Initializing routes...')
+    
+    // 动态导入和挂载路由
+    import('./routes/auth.js').then((m) => {
+      app.use('/api/auth', m.default)
+      console.log('[App] ✓ auth routes loaded')
+    }).catch((err) => {
+      console.error('[App] ✗ Failed to load auth routes:', err.message)
+      initError = `Auth routes failed: ${err.message}`
+    })
+
+    import('./routes/users.js').then((m) => {
+      app.use('/api/users', m.default)
+      console.log('[App] ✓ users routes loaded')
+    }).catch((err) => {
+      console.error('[App] ✗ Failed to load users routes:', err.message)
+      initError = `Users routes failed: ${err.message}`
+    })
+
+    import('./routes/badges.js').then((m) => {
+      app.use('/api/badges', m.default)
+      console.log('[App] ✓ badges routes loaded')
+    }).catch((err) => {
+      console.error('[App] ✗ Failed to load badges routes:', err.message)
+    })
+
+    import('./routes/blindbox.js').then((m) => {
+      app.use('/api/blindbox', m.default)
+      console.log('[App] ✓ blindbox routes loaded')
+    }).catch((err) => {
+      console.error('[App] ✗ Failed to load blindbox routes:', err.message)
+    })
+
+    import('./routes/activities.js').then((m) => {
+      app.use('/api/activities', m.default)
+      console.log('[App] ✓ activities routes loaded')
+    }).catch((err) => {
+      console.error('[App] ✗ Failed to load activities routes:', err.message)
+    })
+
+    import('./routes/honors.js').then((m) => {
+      app.use('/api/honors', m.default)
+      console.log('[App] ✓ honors routes loaded')
+    }).catch((err) => {
+      console.error('[App] ✗ Failed to load honors routes:', err.message)
+    })
+
+    import('./routes/evaluations.js').then((m) => {
+      app.use('/api/evaluations', m.default)
+      console.log('[App] ✓ evaluations routes loaded')
+    }).catch((err) => {
+      console.error('[App] ✗ Failed to load evaluations routes:', err.message)
+    })
+
+    import('./routes/benefits.js').then((m) => {
+      app.use('/api/benefits', m.default)
+      console.log('[App] ✓ benefits routes loaded')
+    }).catch((err) => {
+      console.error('[App] ✗ Failed to load benefits routes:', err.message)
+    })
+
+    import('./routes/admin.js').then((m) => {
+      app.use('/api/admin', m.default)
+      console.log('[App] ✓ admin routes loaded')
+    }).catch((err) => {
+      console.error('[App] ✗ Failed to load admin routes:', err.message)
+    })
+
+    console.log('[App] All route imports initiated')
+    initComplete = true
+  } catch (error) {
+    const err = error as Error
+    console.error('[App] ✗ CRITICAL ERROR during initialization:', err.message)
+    console.error('[App] Stack:', err.stack)
+    initError = err.message
+  }
 }
+
+// 立即初始化路由
+initializeRoutes()
 
 /**
  * 健康检查
  */
 app.get('/api/health', (req: Request, res: Response) => {
-  if (!dbInitialized && initError) {
-    res.status(503).json({
-      success: false,
-      message: 'Service initializing',
-      error: initError.message,
-    })
-    return
-  }
-  
   res.status(200).json({
     success: true,
     message: 'ok',
     timestamp: new Date().toISOString(),
+    initialized: initComplete,
+    error: initError,
   })
 })
 
@@ -107,7 +132,7 @@ app.get('/api/health', (req: Request, res: Response) => {
  * error handler middleware
  */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error('Server error:', error)
+  console.error('[App] Server error:', error.message)
   res.status(500).json({
     success: false,
     error: 'Server internal error',
