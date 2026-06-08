@@ -35,7 +35,7 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await authAPI.login(phone, password);
-      login(res.data.user, res.data.token);
+      login(res.user, res.token);
       navigate("/");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "登录失败，请检查账号密码";
@@ -63,7 +63,7 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await authAPI.register({ name, phone, password, school });
-      login(res.data.user, res.data.token);
+      login(res.user, res.token);
       navigate("/");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "注册失败，请稍后重试";
