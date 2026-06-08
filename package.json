@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "client:dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run server:build",
     "lint": "eslint .",
     "preview": "vite preview",
     "check": "tsc --noEmit",
     "server:dev": "nodemon",
     "server:build": "tsc -p tsconfig.api.json",
+    "start": "tsx dist/api/server.js",
     "dev": "concurrently \"npm run client:dev\" \"npm run server:dev\""
   },
   "dependencies": {
